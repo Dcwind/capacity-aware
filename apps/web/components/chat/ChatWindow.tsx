@@ -6,45 +6,50 @@ import type { CapacityLevel } from '@/lib/types'
 import { postChat } from '@/lib/api'
 import { toast } from 'sonner'
 
-interface Message {
+interface ChatMessage {
   id: string
   role: 'user' | 'assistant'
   text: string
   capacity?: CapacityLevel
   capacityLabel?: string
   suggestions?: Array<{ startDate: string; endDate: string }>
+  meta?: string
 }
 
 export function ChatWindow() {
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<ChatMessage[]>([])
   const scrollRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
+    }
   }, [messages])
 
   async function handleSubmit(text: string) {
-    const userMsg: Message = { id: crypto.randomUUID(), role: 'user', text }
+    const userMsg: ChatMessage = { id: crypto.randomUUID(), role: 'user', text }
     setMessages((m) => [...m, userMsg])
     try {
       const res = await postChat(text)
       const label = res.capacity && res.status ? `${res.status}` : undefined
-      const assistant: Message = {
+      const meta = res.requestId ? `requestId: ${res.requestId}` : undefined
+      const assistant: ChatMessage = {
         id: crypto.randomUUID(),
         role: 'assistant',
         text: res.message,
-        capacity: res.capacity as CapacityLevel | undefined,
+        capacity: (res.capacity as CapacityLevel) || undefined,
         capacityLabel: label,
         suggestions: res.suggestions,
+        meta: meta,
       }
       setMessages((m) => [...m, assistant])
-    } catch (e: any) {
+    } catch (e) {
       toast.error('Failed to send message')
     }
   }
 
   function handleSuggestion(s: { startDate: string; endDate: string }) {
-    handleSubmit(`request leave ${s.startDate} to ${s.endDate}`)
+    void handleSubmit(`request leave ${s.startDate} to ${s.endDate}`)
   }
 
   return (
@@ -64,6 +69,7 @@ export function ChatWindow() {
               capacityLabel={m.capacityLabel}
               suggestions={m.suggestions}
               onSuggestion={handleSuggestion}
+              meta={m.meta}
             />
           ))
         )}

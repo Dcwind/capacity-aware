@@ -10,6 +10,7 @@ export function MessageBubble({
   capacityLabel,
   suggestions,
   onSuggestion,
+  meta,
 }: {
   role: 'user' | 'assistant'
   text: string
@@ -17,6 +18,7 @@ export function MessageBubble({
   capacityLabel?: string
   suggestions?: Array<{ startDate: string; endDate: string }>
   onSuggestion?: (s: { startDate: string; endDate: string }) => void
+  meta?: string
 }) {
   const isUser = role === 'user'
   return (
@@ -44,6 +46,18 @@ export function MessageBubble({
               Try {s.startDate}–{s.endDate}
             </button>
           ))}
+        </div>
+      ) : null}
+      {!isUser && meta ? (
+        <div className="mt-2 text-xs text-muted-foreground flex items-center gap-2">
+          <span>{meta}</span>
+          <button
+            className="rounded border px-1 py-0.5 hover:bg-accent"
+            onClick={() => navigator.clipboard.writeText(meta)}
+            title="Copy"
+          >
+            Copy
+          </button>
         </div>
       ) : null}
     </motion.div>

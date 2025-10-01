@@ -61,6 +61,7 @@ export default function ManagerDashboardPage() {
             <table className="w-full text-sm">
               <thead className="text-left text-muted-foreground">
                 <tr>
+                  <th className="py-2">Request ID</th>
                   <th className="py-2">Name</th>
                   <th className="py-2">Dates</th>
                   <th className="py-2">Status</th>
@@ -70,6 +71,12 @@ export default function ManagerDashboardPage() {
               <tbody>
                 {items.map((it) => (
                   <tr key={it.request_id} className="border-t">
+                    <td className="py-2">
+                      <div className="flex items-center gap-2">
+                        <code className="text-xs">{it.request_id}</code>
+                        <button className="rounded border px-1 py-0.5 hover:bg-accent" onClick={() => navigator.clipboard.writeText(it.request_id)}>Copy</button>
+                      </div>
+                    </td>
                     <td className="py-2">{it.name}</td>
                     <td className="py-2">{it.start} → {it.end}</td>
                     <td className="py-2">{it.status}</td>
