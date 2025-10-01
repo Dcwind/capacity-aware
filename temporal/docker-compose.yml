@@ -1,0 +1,15 @@
+version: '3.9'
+services:
+  temporal:
+    image: temporalio/auto-setup:1.23.1
+    container_name: temporal
+    environment:
+      - DB=sqlite
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development.yaml
+    ports:
+      - "7233:7233"
+    healthcheck:
+      test: ["CMD", "temporal", "--address", "localhost:7233", "workflow", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 10

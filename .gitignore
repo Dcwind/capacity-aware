@@ -1,0 +1,29 @@
+# Node/Next
+node_modules/
+.next/
+.next-cache/
+out/
+*.log
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+
+# Python
+backend/.venv/
+backend/**/__pycache__/
+backend/**/*.pyc
+backend/.mypy_cache/
+backend/.pytest_cache/
+
+# Temporal/Docker
+.temporal/
+**/docker-data/
