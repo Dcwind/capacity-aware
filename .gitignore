@@ -27,3 +27,8 @@ backend/.pytest_cache/
 # Temporal/Docker
 .temporal/
 **/docker-data/
+
+# Databases
+*.sqlite
+*.sqlite3
+backend/leave.sqlite3
