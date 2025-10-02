@@ -6,6 +6,8 @@ from datetime import date as _date
 from app.db.session import get_session, init_db
 from app.db import crud
 from app.services.ids import new_request_id
+from app.temporal.client import get_client
+from app.temporal.workflows.leave_request import LeaveRequestWorkflow, LeaveInput
 
 router = APIRouter()
 
@@ -35,6 +37,10 @@ async def chat(req: ChatRequest, session: Session = Depends(get_session)):
                               end_date=end,
                               capacity='yellow')
     crud.add_audit(session, request_id=rid, actor='system', action='REQUEST_CREATED', details=f'{start_s} to {end_s}')
+    # Start Temporal workflow
+    client = get_client()
+    handle = client.start_workflow(LeaveRequestWorkflow.run, LeaveInput(request_id=rid, user_name='demo-user', start_date=start_s, end_date=end_s), id=f"leave-{rid}", task_queue="leave-planner")
+    _ = handle # silence linter in sync context
     return {
       "message": f"Request received for {start_s} to {end_s}. Pending review. I’ll remind your manager in ~48h.",
       "requestId": rid,
